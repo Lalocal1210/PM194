@@ -11,4 +11,4 @@ const productosFiltrados = productos.filter(producto => producto.precio > 1000);
 // Obtener un nuevo arreglo solo con los nombres
 const nombres = productosFiltrados.map(producto => producto.nombre);
 
-console.log(nombres); // ["Laptop", "Monitor"]
+console.log(nombres); 

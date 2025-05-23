@@ -13,5 +13,5 @@ verificarUsuario("admin")
 .catch(err => console.error(err));
 
 verificarUsuario("Eduardo")
-.the(res => console.log(res))
+.then(res => console.log(res))
 .catch(err => console.error(err));

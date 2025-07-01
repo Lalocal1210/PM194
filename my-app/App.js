@@ -1,110 +1,100 @@
-import React, { useState } from 'react';
-import {
-  Alert,
-  ImageBackground,
-  Platform,
-  SafeAreaView,
-  StyleSheet,
-  Switch,
-  Text,
-  TextInput,
-  TouchableOpacity,
+import React, { useEffect, useState } from "react";
+import {  SafeAreaView,
   View,
+  Text,
+  FlatList,
+  SectionList,
+  StyleSheet,
   ActivityIndicator,
-  Button,
-} from 'react-native';
+} from "react-native";
 
 export default function App() {
-  const [loading, setLoading] = useState(false);
-  const [mensaje, setMensaje] = useState('');
+  const [frutas, setFrutas] = useState([]);
+  const [verduras, setVerduras] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const API_URL = "http://127.0.0.1:8000/productos/";
 
-  const simularCarga = () => {
-    setLoading(true);
-    setMensaje('');
-    setTimeout(() => {
-      setLoading(false);
-      setMensaje(' Carga completa');
-    }, 3000);
-  };
+  useEffect(() => {
+    fetch(API_URL)
+      .then((res) => res.json())
+      .then((data) => {
+        setFrutas(data.frutas);
+        setVerduras(data.verduras);
+      })
+      .catch((error) => console.error(error))
+      .finally(() => setLoading(false));
+  }, []);
+
+  
+  const renderItem = ({ item }) => (
+    <View style={styles.item}>
+      <Text style={styles.nombre}>{item.nombre}</Text>
+    </View>
+  );
+
+  
+  const sections = [
+    { title: "Frutas", data: frutas },
+    { title: "Verduras", data: verduras },
+  ];
+
+  if (loading) {
+    return (
+      <SafeAreaView style={styles.container}>
+        <ActivityIndicator size="large" color="#0000ff" />
+        <Text>Cargando datos...</Text>
+      </SafeAreaView>
+    );
+  }
 
   return (
-    <View style={styles.contenedor}>
-      <Text style={styles.titulo}>
-        {loading ? ' Cargando...' : mensaje}
-      </Text>
+    <SafeAreaView style={styles.container}>
+      <Text style={styles.title}>Lista de Frutas (FlatList)</Text>
+      <FlatList
+        data={frutas}
+        keyExtractor={(item) => item.id.toString()}
+        renderItem={renderItem}
+      />
 
-      {loading && <ActivityIndicator size="large" color="#2196F3" />}
-
-      <Button title="Simular carga" onPress={simularCarga} />
-    </View>
+      <Text style={styles.title}>Frutas y Verduras (SectionList)</Text>
+      <SectionList
+        sections={sections}
+        keyExtractor={(item) => item.id.toString()}
+        renderItem={renderItem}
+        renderSectionHeader={({ section: { title } }) => (
+          <Text style={styles.header}>{title}</Text>
+        )}
+      />
+    </SafeAreaView>
   );
 }
 
 const styles = StyleSheet.create({
- 
-  fondo: {
+  container: {
     flex: 1,
-    width: '100%',
-    height: '100%',
+    marginTop: 30,
+    paddingHorizontal: 16,
   },
-
-
-  contenedor: {
-    flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
+  title: {
+    fontSize: 22,
+    fontWeight: "bold",
+    marginVertical: 12,
   },
-
-  
-  titulo: {
-    color: '#000',
-    fontSize: 24,
-    textAlign: 'center',
-    marginBottom: 20,
-    fontWeight: 'bold',
-  },
-
- 
-  formulario: {
-    backgroundColor: 'rgba(0,0,0,0.5)',
-    width: '90%',
-    padding: 20,
-    borderRadius: 10,
-  },
-
- 
-  input: {
-    backgroundColor: '#fff',
-    borderRadius: 5,
+  header: {
+    fontSize: 20,
+    fontWeight: "bold",
+    backgroundColor: "#ddd",
+    paddingVertical: 4,
     paddingHorizontal: 10,
-    paddingVertical: 8,
-    marginBottom: 15,
+    marginTop: 10,
   },
-
- 
-  switchContainer: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    marginBottom: 20,
-    justifyContent: 'space-between',
-  },
-
-  terminosText: {
-    color: '#fff',
-    fontSize: 14,
-  },
-
-
-  boton: {
-    backgroundColor: '#2196F3',
-    paddingVertical: 12,
+  item: {
+    backgroundColor: "#f9c2ff",
+    padding: 10,
+    marginVertical: 4,
     borderRadius: 5,
   },
-
-  botonTexto: {
-    color: '#fff',
-    fontSize: 16,
-    textAlign: 'center',
-    fontWeight: 'bold',
+  nombre: {
+    fontSize: 18,
   },
 });
